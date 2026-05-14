@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KindAuction — Family-Friendly Second-Hand Auctions</title>
+  <style>
+    :root {
+      --bg: #fffaf2;
+      --surface: #ffffff;
+      --surface-soft: #fff3df;
+      --surface-mint: #eaf8f1;
+      --surface-blue: #edf7ff;
+      --text: #273235;
+      --muted: #637174;
+      --brand: #ff8f70;
+      --brand-dark: #d95f43;
+      --green: #2f8f68;
+      --blue: #3377b5;
+      --yellow: #ffd166;
+      --danger: #bf4545;
+      --border: #eadfd2;
+      --shadow: 0 14px 40px rgba(83, 63, 43, 0.11);
+      --radius: 24px;
+      --radius-sm: 16px;
+      --focus: 0 0 0 4px rgba(51, 119, 181, 0.2);
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255, 209, 102, 0.2), transparent 34rem),
+        linear-gradient(180deg, var(--bg), #fffdf9 48%, #f7fbf8);
+      line-height: 1.5;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    button, .button {
+      border: 0;
+      border-radius: 999px;
+      background: var(--brand);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 800;
+      padding: 0.85rem 1.1rem;
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+    }
+
+    button:hover, .button:hover { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(217, 95, 67, 0.18); }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: none; box-shadow: var(--focus); }
+    button.secondary, .button.secondary { background: #fff; color: var(--text); border: 1px solid var(--border); }
+    button.ghost { background: transparent; color: var(--brand-dark); padding-inline: 0.6rem; }
+    button.small { padding: 0.62rem 0.85rem; font-size: 0.92rem; }
+
+    .container {
+      width: min(var(--max), calc(100% - 2rem));
+      margin-inline: auto;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 1rem;
+      top: -4rem;
+      background: var(--blue);
+      color: white;
+      padding: 0.75rem 1rem;
+      border-radius: 999px;
+      z-index: 99;
+    }
+    .skip-link:focus { top: 1rem; }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255, 250, 242, 0.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(234, 223, 210, 0.85);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.9rem 0;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 950;
+      letter-spacing: -0.03em;
+      font-size: 1.18rem;
+    }
+
+    .logo-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #ffd166, #ff8f70 54%, #8fd9b6);
+      box-shadow: 0 8px 20px rgba(255, 143, 112, 0.25);
+    }
+
+    nav { display: none; gap: 1.2rem; color: var(--muted); font-weight: 750; }
+    nav a:hover { color: var(--brand-dark); }
+
+    .hero { padding: 2.2rem 0 1.2rem; }
+
+    .hero-grid {
+      display: grid;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      color: var(--green);
+      background: var(--surface-mint);
+      border: 1px solid #cfeee0;
+      border-radius: 999px;
+      padding: 0.42rem 0.75rem;
+      font-weight: 850;
+      font-size: 0.9rem;
+    }
+
+    h1, h2, h3 { line-height: 1.08; margin: 0; letter-spacing: -0.045em; }
+    h1 { font-size: clamp(2.25rem, 9vw, 5.25rem); max-width: 11ch; margin-top: 1rem; }
+    h2 { font-size: clamp(2rem, 5vw, 3.1rem); }
+    h3 { font-size: 1.22rem; }
+
+    .hero p { color: var(--muted); font-size: 1.1rem; max-width: 62ch; }
+
+    .search-panel {
+      display: grid;
+      gap: 0.75rem;
+      padding: 0.55rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      max-width: 760px;
+    }
+
+    .search-panel input {
+      width: 100%;
+      min-height: 52px;
+      border: 0;
+      border-radius: 999px;
+      padding: 0 1rem;
+      background: #fff8ed;
+      color: var(--text);
+    }
+
+    .quick-cats { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 1rem; }
+    .chip {
+      border: 1px solid var(--border);
+      color: var(--text);
+      background: rgba(255,255,255,0.8);
+      border-radius: 999px;
+      padding: 0.55rem 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .chip[aria-pressed="true"], .chip:hover { background: var(--surface-mint); border-color: #bee7d4; color: var(--green); }
+
+    .hero-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1rem;
+      overflow: hidden;
+    }
+
+    .hero-image {
+      min-height: 270px;
+      border-radius: 20px;
+      background:
+        linear-gradient(160deg, rgba(255,255,255,0.3), transparent),
+        linear-gradient(135deg, #ffe4bd, #e4f6ec 48%, #edf7ff);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 1.2rem;
+      position: relative;
+    }
+
+    .hero-image .big-emoji { font-size: 5rem; filter: drop-shadow(0 10px 16px rgba(0,0,0,0.08)); }
+    .floating-note {
+      position: absolute;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(234, 223, 210, 0.9);
+      border-radius: 18px;
+      padding: 0.75rem;
+      box-shadow: 0 8px 24px rgba(83,63,43,0.1);
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+    .floating-note.one { left: 0.8rem; top: 1rem; }
+    .floating-note.two { right: 0.9rem; bottom: 1rem; }
+
+    section { padding: 2.3rem 0; }
+    .section-head { display: grid; gap: 0.6rem; margin-bottom: 1.2rem; }
+    .section-head p { color: var(--muted); margin: 0; max-width: 70ch; }
+
+    .market-layout { display: grid; gap: 1rem; align-items: start; }
+
+    .filters {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 28px rgba(83,63,43,0.07);
+      padding: 1rem;
+      position: sticky;
+      top: 84px;
+    }
+
+    .filter-grid { display: grid; gap: 0.85rem; }
+    label { font-weight: 850; font-size: 0.9rem; display: grid; gap: 0.35rem; color: #465356; }
+    select, input[type="number"] {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      min-height: 45px;
+      padding: 0 0.75rem;
+      background: #fffdf9;
+      color: var(--text);
+    }
+
+    .inline-check {
+      display: flex;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 0.55rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .results-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .cards {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
+    .auction-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 30px rgba(83,63,43,0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+    }
+
+    .item-art {
+      min-height: 170px;
+      display: grid;
+      place-items: center;
+      font-size: 4.5rem;
+      background: linear-gradient(135deg, var(--card-a), var(--card-b));
+      position: relative;
+    }
+
+    .badge-row { position: absolute; top: 0.8rem; left: 0.8rem; right: 0.8rem; display: flex; justify-content: space-between; gap: 0.5rem; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.28rem;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid rgba(255,255,255,0.7);
+      color: #425052;
+      border-radius: 999px;
+      padding: 0.34rem 0.55rem;
+      font-weight: 850;
+      font-size: 0.78rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .card-body { padding: 1rem; display: grid; gap: 0.85rem; flex: 1; }
+    .meta { color: var(--muted); font-weight: 750; font-size: 0.92rem; display: flex; gap: 0.65rem; flex-wrap: wrap; }
+    .price-row { display: grid; grid-template-columns: 1fr auto; gap: 0.75rem; align-items: end; }
+    .bid-label { color: var(--muted); font-size: 0.8rem; font-weight: 850; text-transform: uppercase; letter-spacing: 0.04em; }
+    .bid-value { font-size: 1.55rem; font-weight: 950; letter-spacing: -0.04em; }
+    .buy-now { color: var(--blue); background: var(--surface-blue); border-radius: 999px; padding: 0.42rem 0.62rem; font-weight: 900; font-size: 0.85rem; white-space: nowrap; }
+    .card-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: auto; }
+
+    .empty-state {
+      display: none;
+      text-align: center;
+      padding: 3rem 1rem;
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      color: var(--muted);
+    }
+
+    .info-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .info-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.15rem;
+      box-shadow: 0 8px 26px rgba(83,63,43,0.07);
+    }
+    .icon-circle { width: 48px; height: 48px; border-radius: 17px; display: grid; place-items: center; background: var(--surface-soft); margin-bottom: 0.85rem; font-size: 1.4rem; }
+    .info-card p { color: var(--muted); margin-bottom: 0; }
+
+    .how {
+      background: linear-gradient(135deg, #273235, #345a51);
+      color: #fff;
+      border-radius: 32px;
+      padding: 1.2rem;
+    }
+    .how .section-head p { color: rgba(255,255,255,0.78); }
+    .steps { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+    .step { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 24px; padding: 1rem; }
+    .step-num { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 999px; background: var(--yellow); color: var(--text); font-weight: 950; margin-bottom: 0.75rem; }
+
+    footer { padding: 2rem 0; color: var(--muted); border-top: 1px solid var(--border); }
+    .footer-grid { display: grid; gap: 1rem; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 0.8rem; font-weight: 800; color: var(--text); }
+
+    dialog {
+      width: min(930px, calc(100% - 1rem));
+      border: 0;
+      border-radius: 28px;
+      padding: 0;
+      box-shadow: 0 30px 80px rgba(39,50,53,0.3);
+      overflow: hidden;
+    }
+    dialog::backdrop { background: rgba(39,50,53,0.45); backdrop-filter: blur(3px); }
+    .modal-shell { background: var(--surface); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem; border-bottom: 1px solid var(--border); }
+    .modal-grid { display: grid; gap: 1rem; padding: 1rem; }
+    .modal-art { min-height: 280px; border-radius: 22px; display: grid; place-items: center; font-size: 6rem; background: linear-gradient(135deg, var(--modal-a), var(--modal-b)); }
+    .modal-content { display: grid; gap: 1rem; }
+    .detail-list { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 0.6rem; }
+    .detail-pill { background: #fff8ed; border: 1px solid var(--border); border-radius: 16px; padding: 0.65rem; }
+    .detail-pill strong { display: block; font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+    .bid-box { background: var(--surface-mint); border: 1px solid #cfeee0; border-radius: 22px; padding: 1rem; display: grid; gap: 0.75rem; }
+    .bid-form { display: grid; grid-template-columns: 1fr auto; gap: 0.6rem; }
+    .message { min-height: 1.4rem; font-weight: 850; }
+    .message.success { color: var(--green); }
+    .message.error { color: var(--danger); }
+    .history { margin: 0; padding-left: 1.2rem; color: var(--muted); }
+    .safety-note { background: #fff8ed; border: 1px solid var(--border); border-radius: 18px; padding: 0.85rem; color: #4b5a5d; }
+
+    @media (min-width: 720px) {
+      nav { display: flex; }
+      .search-panel { grid-template-columns: 1fr auto; }
+      .hero-grid { grid-template-columns: 1.08fr 0.92fr; }
+      .market-layout { grid-template-columns: 280px 1fr; }
+      .footer-grid { grid-template-columns: 1fr auto; align-items: center; }
+      .modal-grid { grid-template-columns: 0.95fr 1.05fr; padding: 1.25rem; }
+      .how { padding: 1.5rem; }
+    }
+
+    @media (max-width: 520px) {
+      .topbar .button { display: none; }
+      .search-panel { border-radius: 24px; }
+      .search-panel input, .search-panel button { border-radius: 18px; width: 100%; }
+      .filters { position: static; }
+      .card-actions, .bid-form { grid-template-columns: 1fr; }
+      .detail-list { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#auctions">Skip to auctions</a>
+
+  <header>
+    <div class="container topbar" aria-label="Primary navigation">
+      <a class="logo" href="#top" aria-label="KindAuction home">
+        <span class="logo-mark" aria-hidden="true">🧸</span>
+        <span>KindAuction</span>
+      </a>
+      <nav>
+        <a href="#auctions">Auctions</a>
+        <a href="#safety">Safety</a>
+        <a href="#how-it-works">How it works</a>
+      </nav>
+      <a class="button" href="#how-it-works">Sell an item</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container hero-grid">
+        <div>
+          <span class="eyebrow">🌱 Affordable finds for growing families</span>
+          <h1 id="hero-title">Bid on safe, loved kids’ essentials.</h1>
+          <p>KindAuction is a family-first auction marketplace for children’s clothes, second-hand toys, nursery furniture, and everyday parenting gear — designed to feel simple, local, and trustworthy.</p>
+
+          <form class="search-panel" role="search" aria-label="Search auctions" onsubmit="event.preventDefault(); applyFilters();">
+            <input id="searchInput" type="search" placeholder="Search rain boots, crib, LEGO, stroller…" aria-label="Search auction items" />
+            <button type="submit">Search auctions</button>
+          </form>
+
+          <div class="quick-cats" aria-label="Popular categories">
+            <button class="chip" type="button" data-category="All" aria-pressed="true">All</button>
+            <button class="chip" type="button" data-category="Clothes" aria-pressed="false">👕 Clothes</button>
+            <button class="chip" type="button" data-category="Toys" aria-pressed="false">🧩 Toys</button>
+            <button class="chip" type="button" data-category="Furniture" aria-pressed="false">🪑 Furniture</button>
+            <button class="chip" type="button" data-category="Gear" aria-pressed="false">🚲 Gear</button>
+          </div>
+        </div>
+
+        <aside class="hero-card" aria-label="Marketplace highlights">
+          <div class="hero-image">
+            <span class="floating-note one">✅ Parent-verified sellers</span>
+            <span class="big-emoji" aria-hidden="true">👶🧸</span>
+            <span class="floating-note two">♻️ Reuse saves families money</span>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="auctions" aria-labelledby="auction-title">
+      <div class="container">
+        <div class="section-head">
+          <h2 id="auction-title">Active family auctions</h2>
+          <p>Browse vetted listings with clear condition labels, seller reputation, pickup location, buy-now options, and countdowns that keep bidding easy to understand.</p>
+        </div>
+
+        <div class="market-layout">
+          <aside class="filters" aria-label="Auction filters">
+            <h3>Filters</h3>
+            <div class="filter-grid">
+              <label>Category
+                <select id="categoryFilter">
+                  <option value="All">All categories</option>
+                  <option value="Clothes">Children’s clothes</option>
+                  <option value="Toys">Second-hand toys</option>
+                  <option value="Furniture">Children’s furniture</option>
+                  <option value="Gear">Strollers & gear</option>
+                </select>
+              </label>
+              <label>Maximum current bid
+                <input id="priceFilter" type="number" min="0" step="1" placeholder="Any price" />
+              </label>
+              <label>Condition
+                <select id="conditionFilter">
+                  <option value="All">Any condition</option>
+                  <option value="Like new">Like new</option>
+                  <option value="Excellent">Excellent</option>
+                  <option value="Good">Good</option>
+                  <option value="Gently used">Gently used</option>
+                </select>
+              </label>
+              <label>Location
+                <select id="locationFilter">
+                  <option value="All">Any nearby location</option>
+                  <option value="Brooklyn, NY">Brooklyn, NY</option>
+                  <option value="Queens, NY">Queens, NY</option>
+                  <option value="Jersey City, NJ">Jersey City, NJ</option>
+                  <option value="Hoboken, NJ">Hoboken, NJ</option>
+                </select>
+              </label>
+              <label class="inline-check">
+                <input id="endingSoonFilter" type="checkbox" />
+                Ending in the next 24 hours
+              </label>
+              <button class="secondary small" type="button" id="resetFilters">Reset filters</button>
+            </div>
+          </aside>
+
+          <div>
+            <div class="results-bar" aria-live="polite">
+              <span id="resultsCount">Showing all auctions</span>
+              <span>🛡️ Safety-reviewed demo listings</span>
+            </div>
+            <div class="cards" id="auctionCards"></div>
+            <div class="empty-state" id="emptyState">
+              <h3>No matching auctions</h3>
+              <p>Try clearing a filter or searching for a broader family item.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="safety" aria-labelledby="safety-title">
+      <div class="container">
+        <div class="section-head">
+          <h2 id="safety-title">Built for parent trust and child safety</h2>
+          <p>The prototype highlights marketplace policies that matter for families now, while leaving room for future moderation, payments, reputation, and support workflows.</p>
+        </div>
+        <div class="info-grid">
+          <article class="info-card">
+            <div class="icon-circle">👪</div>
+            <h3>Verified parents</h3>
+            <p>Seller profiles can include ID checks, community ratings, response history, and repeat-family badges before payments are added.</p>
+          </article>
+          <article class="info-card">
+            <div class="icon-circle">📍</div>
+            <h3>Safe pickup or delivery</h3>
+            <p>Listings emphasize public pickup points, delivery preferences, no-pressure messaging, and clear local availability.</p>
+          </article>
+          <article class="info-card">
+            <div class="icon-circle">🧯</div>
+            <h3>Dispute support</h3>
+            <p>Future order states can support holds, issue reporting, refunds, and staff mediation for family-sensitive purchases.</p>
+          </article>
+          <article class="info-card">
+            <div class="icon-circle">✅</div>
+            <h3>Child-safe product checks</h3>
+            <p>Cribs, strollers, toys, and chairs show safety notes so buyers can confirm recalls, missing parts, and age suitability.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="how-it-works" aria-labelledby="how-title">
+      <div class="container how">
+        <div class="section-head">
+          <h2 id="how-title">How KindAuction works</h2>
+          <p>A simple, non-technical journey for busy parents: list, bid, win, and arrange a safe handoff.</p>
+        </div>
+        <div class="steps">
+          <article class="step"><div class="step-num">1</div><h3>List item</h3><p>Add photos, condition, safety notes, pickup area, starting bid, and optional buy-now price.</p></article>
+          <article class="step"><div class="step-num">2</div><h3>Bid simply</h3><p>Buyers see a clear minimum next bid and receive friendly validation before a simulated bid is accepted.</p></article>
+          <article class="step"><div class="step-num">3</div><h3>Win safely</h3><p>The future product can notify winners, reserve the item, and prepare a secure payment or pickup flow.</p></article>
+          <article class="step"><div class="step-num">4</div><h3>Arrange handoff</h3><p>Families agree on public pickup, local delivery, or shipping with dispute support available if needed.</p></article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-grid">
+      <div>
+        <a class="logo" href="#top"><span class="logo-mark" aria-hidden="true">🧸</span><span>KindAuction</span></a>
+        <p>Helping families save money, reduce waste, and keep loved children’s items in use longer.</p>
+      </div>
+      <div class="footer-links" aria-label="Footer links">
+        <a href="#safety">About safety</a>
+        <a href="mailto:hello@kindauction.example">Contact</a>
+        <a href="#">Terms placeholder</a>
+      </div>
+    </div>
+  </footer>
+
+  <dialog id="itemModal" aria-labelledby="modalTitle">
+    <div class="modal-shell">
+      <div class="modal-header">
+        <strong id="modalTitle">Auction details</strong>
+        <button class="secondary small" type="button" id="closeModal" aria-label="Close item details">Close</button>
+      </div>
+      <div class="modal-grid">
+        <div class="modal-art" id="modalArt" aria-hidden="true"></div>
+        <div class="modal-content" id="modalContent"></div>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    // Mock data only: this prototype intentionally has no backend, database, or framework dependency.
+    const auctions = [
+      {
+        id: 1,
+        title: "Winter jacket, size 4 years",
+        category: "Clothes",
+        condition: "Excellent",
+        currentBid: 24,
+        buyNow: 45,
+        endsAt: Date.now() + 1000 * 60 * 60 * 18,
+        rating: 4.9,
+        seller: "Maya P.",
+        location: "Brooklyn, NY",
+        emoji: "🧥",
+        colors: ["#ffe4bd", "#eaf8f1"],
+        description: "Warm waterproof jacket with detachable hood. Freshly washed, smoke-free home, minor scuff on one cuff.",
+        safety: "Check sizing before pickup. No drawstrings around the neck area.",
+        history: ["Ari bid $24", "Lina bid $21", "Opening bid $15"]
+      },
+      {
+        id: 2,
+        title: "LEGO Duplo big box",
+        category: "Toys",
+        condition: "Good",
+        currentBid: 31,
+        buyNow: 58,
+        endsAt: Date.now() + 1000 * 60 * 60 * 8,
+        rating: 4.8,
+        seller: "Jon R.",
+        location: "Queens, NY",
+        emoji: "🧱",
+        colors: ["#edf7ff", "#fff3df"],
+        description: "Large mixed Duplo set with animals, people, blocks, and a storage tub. Great for ages 2+.",
+        safety: "Pieces are large toddler-safe blocks. Seller confirms no broken pieces noticed.",
+        history: ["Noah bid $31", "Priya bid $28", "Opening bid $20"]
+      },
+      {
+        id: 3,
+        title: "Wooden baby crib",
+        category: "Furniture",
+        condition: "Gently used",
+        currentBid: 96,
+        buyNow: 180,
+        endsAt: Date.now() + 1000 * 60 * 60 * 36,
+        rating: 5.0,
+        seller: "Elena S.",
+        location: "Jersey City, NJ",
+        emoji: "🛏️",
+        colors: ["#eaf8f1", "#ffe4bd"],
+        description: "Solid wood crib with adjustable mattress height. Includes assembly screws and printed instructions.",
+        safety: "Buyer should verify current crib standards and recall status before use. Mattress not included.",
+        history: ["Kim bid $96", "Omar bid $88", "Opening bid $70"]
+      },
+      {
+        id: 4,
+        title: "City stroller with rain cover",
+        category: "Gear",
+        condition: "Good",
+        currentBid: 74,
+        buyNow: 130,
+        endsAt: Date.now() + 1000 * 60 * 60 * 22,
+        rating: 4.7,
+        seller: "Sam & Alex",
+        location: "Hoboken, NJ",
+        emoji: "🛒",
+        colors: ["#fff3df", "#edf7ff"],
+        description: "Compact fold stroller for city sidewalks. Basket, rain cover, and cup holder included.",
+        safety: "Brakes and straps tested by seller. Buyer should inspect wheels and harness at handoff.",
+        history: ["Mina bid $74", "Theo bid $70", "Opening bid $50"]
+      },
+      {
+        id: 5,
+        title: "Children’s bookshelf",
+        category: "Furniture",
+        condition: "Like new",
+        currentBid: 42,
+        buyNow: 85,
+        endsAt: Date.now() + 1000 * 60 * 60 * 55,
+        rating: 4.9,
+        seller: "Nadia K.",
+        location: "Brooklyn, NY",
+        emoji: "📚",
+        colors: ["#edf7ff", "#eaf8f1"],
+        description: "Low Montessori-style shelf for picture books and baskets. Rounded corners and sturdy base.",
+        safety: "Wall anchor included. Recommended to anchor furniture in children’s rooms.",
+        history: ["Grace bid $42", "Opening bid $30"]
+      },
+      {
+        id: 6,
+        title: "Baby high chair",
+        category: "Furniture",
+        condition: "Excellent",
+        currentBid: 37,
+        buyNow: 70,
+        endsAt: Date.now() + 1000 * 60 * 60 * 12,
+        rating: 4.6,
+        seller: "Tara L.",
+        location: "Queens, NY",
+        emoji: "🪑",
+        colors: ["#ffe4bd", "#edf7ff"],
+        description: "Wipe-clean baby chair with removable tray and five-point harness. Great for grandparents’ home.",
+        safety: "Harness included and tray locks. Buyer should confirm stability before use.",
+        history: ["Ben bid $37", "Opening bid $25"]
+      },
+      {
+        id: 7,
+        title: "Wooden toy kitchen",
+        category: "Toys",
+        condition: "Gently used",
+        currentBid: 66,
+        buyNow: null,
+        endsAt: Date.now() + 1000 * 60 * 60 * 5,
+        rating: 4.9,
+        seller: "Hannah W.",
+        location: "Jersey City, NJ",
+        emoji: "🍳",
+        colors: ["#eaf8f1", "#fff3df"],
+        description: "Small wooden pretend kitchen with knobs, sink, and play pans. Some paint wear from normal play.",
+        safety: "No loose screws reported. Recommended for ages 3+ due to small accessory pieces.",
+        history: ["Ivy bid $66", "Max bid $61", "Opening bid $40"]
+      },
+      {
+        id: 8,
+        title: "Yellow rain boots, toddler 7",
+        category: "Clothes",
+        condition: "Good",
+        currentBid: 13,
+        buyNow: 24,
+        endsAt: Date.now() + 1000 * 60 * 60 * 30,
+        rating: 5.0,
+        seller: "Chris M.",
+        location: "Hoboken, NJ",
+        emoji: "🥾",
+        colors: ["#fff3df", "#eaf8f1"],
+        description: "Bright rain boots with grippy soles. Perfect for puddle days and daycare backup clothes.",
+        safety: "Soles have traction and no cracks. Please check toddler shoe size before bidding.",
+        history: ["Sofia bid $13", "Opening bid $8"]
+      }
+    ];
+
+    const cards = document.querySelector("#auctionCards");
+    const searchInput = document.querySelector("#searchInput");
+    const categoryFilter = document.querySelector("#categoryFilter");
+    const priceFilter = document.querySelector("#priceFilter");
+    const conditionFilter = document.querySelector("#conditionFilter");
+    const locationFilter = document.querySelector("#locationFilter");
+    const endingSoonFilter = document.querySelector("#endingSoonFilter");
+    const resultsCount = document.querySelector("#resultsCount");
+    const emptyState = document.querySelector("#emptyState");
+    const modal = document.querySelector("#itemModal");
+    const modalContent = document.querySelector("#modalContent");
+    const modalArt = document.querySelector("#modalArt");
+    const modalTitle = document.querySelector("#modalTitle");
+    let activeCategory = "All";
+    let visibleAuctions = [...auctions];
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
+    }
+
+    function getTimeParts(ms) {
+      if (ms <= 0) return "Ended";
+      const totalMinutes = Math.floor(ms / 60000);
+      const days = Math.floor(totalMinutes / 1440);
+      const hours = Math.floor((totalMinutes % 1440) / 60);
+      const minutes = totalMinutes % 60;
+      if (days > 0) return `${days}d ${hours}h left`;
+      if (hours > 0) return `${hours}h ${minutes}m left`;
+      return `${minutes}m left`;
+    }
+
+    function minimumBid(item) {
+      return item.currentBid + Math.max(2, Math.ceil(item.currentBid * 0.05));
+    }
+
+    function renderCards() {
+      cards.innerHTML = visibleAuctions.map(item => `
+        <article class="auction-card" style="--card-a:${item.colors[0]};--card-b:${item.colors[1]};">
+          <div class="item-art" aria-hidden="true">
+            <div class="badge-row">
+              <span class="badge">${item.category}</span>
+              <span class="badge">⏱️ <span data-time-id="${item.id}">${getTimeParts(item.endsAt - Date.now())}</span></span>
+            </div>
+            ${item.emoji}
+          </div>
+          <div class="card-body">
+            <div>
+              <h3>${item.title}</h3>
+              <div class="meta"><span>${item.condition}</span><span>⭐ ${item.rating}</span><span>📍 ${item.location}</span></div>
+            </div>
+            <div class="price-row">
+              <div>
+                <div class="bid-label">Current bid</div>
+                <div class="bid-value" data-bid-id="${item.id}">${formatCurrency(item.currentBid)}</div>
+              </div>
+              ${item.buyNow ? `<span class="buy-now">Buy now ${formatCurrency(item.buyNow)}</span>` : `<span class="buy-now">Auction only</span>`}
+            </div>
+            <p>${item.description}</p>
+            <div class="card-actions">
+              <button class="secondary small" type="button" onclick="openDetails(${item.id})">View details</button>
+              <button class="small" type="button" onclick="quickBid(${item.id})">Bid ${formatCurrency(minimumBid(item))}</button>
+            </div>
+          </div>
+        </article>
+      `).join("");
+
+      emptyState.style.display = visibleAuctions.length ? "none" : "block";
+      resultsCount.textContent = visibleAuctions.length === auctions.length
+        ? "Showing all auctions"
+        : `Showing ${visibleAuctions.length} of ${auctions.length} auctions`;
+    }
+
+    function applyFilters() {
+      const query = searchInput.value.trim().toLowerCase();
+      const maxPrice = Number(priceFilter.value);
+      visibleAuctions = auctions.filter(item => {
+        const matchesSearch = !query || [item.title, item.category, item.condition, item.location, item.description].join(" ").toLowerCase().includes(query);
+        const matchesCategory = activeCategory === "All" || item.category === activeCategory;
+        const matchesPrice = !priceFilter.value || item.currentBid <= maxPrice;
+        const matchesCondition = conditionFilter.value === "All" || item.condition === conditionFilter.value;
+        const matchesLocation = locationFilter.value === "All" || item.location === locationFilter.value;
+        const matchesEnding = !endingSoonFilter.checked || item.endsAt - Date.now() <= 1000 * 60 * 60 * 24;
+        return matchesSearch && matchesCategory && matchesPrice && matchesCondition && matchesLocation && matchesEnding;
+      });
+      renderCards();
+    }
+
+    function setCategory(category) {
+      activeCategory = category;
+      categoryFilter.value = category;
+      document.querySelectorAll(".chip").forEach(chip => chip.setAttribute("aria-pressed", chip.dataset.category === category));
+      applyFilters();
+    }
+
+    function updateVisibleBid(item) {
+      document.querySelectorAll(`[data-bid-id="${item.id}"]`).forEach(node => node.textContent = formatCurrency(item.currentBid));
+    }
+
+    function quickBid(id) {
+      const item = auctions.find(auction => auction.id === id);
+      const bid = minimumBid(item);
+      item.currentBid = bid;
+      item.history.unshift(`You bid ${formatCurrency(bid)}`);
+      updateVisibleBid(item);
+      renderCards();
+    }
+
+    function openDetails(id) {
+      const item = auctions.find(auction => auction.id === id);
+      modalTitle.textContent = item.title;
+      modalArt.textContent = item.emoji;
+      modalArt.style.setProperty("--modal-a", item.colors[0]);
+      modalArt.style.setProperty("--modal-b", item.colors[1]);
+      modalContent.innerHTML = `
+        <div>
+          <span class="eyebrow">${item.category} · ${item.condition}</span>
+          <h2>${item.title}</h2>
+          <p>${item.description}</p>
+        </div>
+        <div class="detail-list">
+          <div class="detail-pill"><strong>Current bid</strong><span data-modal-bid>${formatCurrency(item.currentBid)}</span></div>
+          <div class="detail-pill"><strong>Buy now</strong>${item.buyNow ? formatCurrency(item.buyNow) : "Not available"}</div>
+          <div class="detail-pill"><strong>Time left</strong><span data-modal-time>${getTimeParts(item.endsAt - Date.now())}</span></div>
+          <div class="detail-pill"><strong>Seller</strong>${item.seller} · ⭐ ${item.rating}</div>
+          <div class="detail-pill"><strong>Location</strong>${item.location}</div>
+          <div class="detail-pill"><strong>Next minimum</strong><span data-min-bid>${formatCurrency(minimumBid(item))}</span></div>
+        </div>
+        <div class="safety-note"><strong>Safety note:</strong> ${item.safety}</div>
+        <div class="bid-box">
+          <strong>Place a simulated bid</strong>
+          <form class="bid-form" onsubmit="placeBid(event, ${item.id})">
+            <input id="bidInput" type="number" min="${minimumBid(item)}" step="1" value="${minimumBid(item)}" aria-label="Your bid amount" />
+            <button type="submit">Place bid</button>
+          </form>
+          <div class="message" id="bidMessage" aria-live="polite"></div>
+        </div>
+        <div>
+          <h3>Bid history</h3>
+          <ol class="history" id="bidHistory">${item.history.map(entry => `<li>${entry}</li>`).join("")}</ol>
+        </div>
+      `;
+      modal.showModal();
+      setTimeout(() => document.querySelector("#bidInput")?.focus(), 80);
+    }
+
+    function placeBid(event, id) {
+      event.preventDefault();
+      const item = auctions.find(auction => auction.id === id);
+      const input = document.querySelector("#bidInput");
+      const message = document.querySelector("#bidMessage");
+      const proposed = Number(input.value);
+      if (!proposed || proposed <= item.currentBid) {
+        message.textContent = `Please enter more than the current bid of ${formatCurrency(item.currentBid)}.`;
+        message.className = "message error";
+        return;
+      }
+      item.currentBid = proposed;
+      item.history.unshift(`You bid ${formatCurrency(proposed)}`);
+      document.querySelector("[data-modal-bid]").textContent = formatCurrency(item.currentBid);
+      document.querySelector("[data-min-bid]").textContent = formatCurrency(minimumBid(item));
+      document.querySelector("#bidHistory").innerHTML = item.history.map(entry => `<li>${entry}</li>`).join("");
+      input.min = minimumBid(item);
+      input.value = minimumBid(item);
+      message.textContent = "Bid accepted. This is a demo, so no payment was taken.";
+      message.className = "message success";
+      updateVisibleBid(item);
+      applyFilters();
+    }
+
+    function tickCountdowns() {
+      auctions.forEach(item => {
+        document.querySelectorAll(`[data-time-id="${item.id}"]`).forEach(node => node.textContent = getTimeParts(item.endsAt - Date.now()));
+      });
+      const openTitle = modal.open ? modalTitle.textContent : null;
+      if (openTitle) {
+        const item = auctions.find(auction => auction.title === openTitle);
+        const modalTime = document.querySelector("[data-modal-time]");
+        if (item && modalTime) modalTime.textContent = getTimeParts(item.endsAt - Date.now());
+      }
+    }
+
+    document.querySelectorAll(".chip").forEach(chip => chip.addEventListener("click", () => setCategory(chip.dataset.category)));
+    [searchInput, categoryFilter, priceFilter, conditionFilter, locationFilter, endingSoonFilter].forEach(control => {
+      control.addEventListener("input", () => {
+        if (control === categoryFilter) setCategory(categoryFilter.value);
+        else applyFilters();
+      });
+    });
+    document.querySelector("#resetFilters").addEventListener("click", () => {
+      searchInput.value = "";
+      priceFilter.value = "";
+      conditionFilter.value = "All";
+      locationFilter.value = "All";
+      endingSoonFilter.checked = false;
+      setCategory("All");
+    });
+    document.querySelector("#closeModal").addEventListener("click", () => modal.close());
+    modal.addEventListener("click", event => {
+      const rect = modal.getBoundingClientRect();
+      const clickedBackdrop = event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom;
+      if (clickedBackdrop) modal.close();
+    });
+
+    renderCards();
+    setInterval(tickCountdowns, 30000);
+  </script>
+</body>
+</html>
