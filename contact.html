@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact KindAuction</title>
+  <style>
+    :root {
+      --bg: #fffaf2;
+      --surface: #ffffff;
+      --border: #eadfd2;
+      --text: #273235;
+      --muted: #637174;
+      --brand: #ff8f70;
+      --brand-dark: #d95f43;
+      --shadow: 0 14px 40px rgba(83, 63, 43, 0.11);
+      --radius: 24px;
+      --focus: 0 0 0 4px rgba(51, 119, 181, 0.2);
+      --max: 860px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255, 209, 102, 0.2), transparent 34rem),
+        linear-gradient(180deg, var(--bg), #fffdf9 48%, #f7fbf8);
+      line-height: 1.5;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .container { width: min(var(--max), calc(100% - 2rem)); margin-inline: auto; }
+
+    header {
+      position: sticky;
+      top: 0;
+      background: rgba(255, 250, 242, 0.9);
+      border-bottom: 1px solid rgba(234, 223, 210, 0.85);
+      backdrop-filter: blur(16px);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.9rem 0;
+    }
+
+    .logo { display: inline-flex; align-items: center; gap: 0.6rem; font-weight: 950; font-size: 1.18rem; }
+    .logo-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #ffd166, #ff8f70 54%, #8fd9b6);
+      box-shadow: 0 8px 20px rgba(255, 143, 112, 0.25);
+    }
+
+    main { padding: 2rem 0 3rem; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.3rem;
+      display: grid;
+      gap: 1rem;
+    }
+
+    h1 { margin: 0; font-size: clamp(2rem, 7vw, 3.3rem); letter-spacing: -0.04em; }
+    p { margin: 0; color: var(--muted); }
+
+    .contact-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .contact-list li {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 0.85rem;
+      background: #fffdf9;
+      font-weight: 700;
+    }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+
+    .button {
+      border: 0;
+      border-radius: 999px;
+      background: var(--brand);
+      color: white;
+      cursor: pointer;
+      font-weight: 800;
+      padding: 0.8rem 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .button.secondary {
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .button:hover { background: var(--brand-dark); }
+    .button.secondary:hover { background: #fff8ed; }
+    .button:focus-visible, a:focus-visible { outline: none; box-shadow: var(--focus); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container topbar">
+      <a class="logo" href="index.html" aria-label="KindAuction home">
+        <span class="logo-mark" aria-hidden="true">🧸</span>
+        <span>KindAuction</span>
+      </a>
+      <a class="button secondary" href="index.html">Back to auctions</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="card" aria-labelledby="contact-title">
+        <h1 id="contact-title">Contact us</h1>
+        <p>Need help with a listing, a bid, or account safety? Reach our family support team and we will answer as quickly as possible.</p>
+
+        <ul class="contact-list">
+          <li>Email: <a href="mailto:hello@kindauction.example">hello@kindauction.example</a></li>
+          <li>Phone: <a href="tel:+1-800-555-0146">+1 (800) 555-0146</a></li>
+          <li>Hours: Monday–Friday, 9:00 AM to 6:00 PM (ET)</li>
+        </ul>
+
+        <div class="actions">
+          <a class="button" href="mailto:hello@kindauction.example">Send an email</a>
+          <a class="button secondary" href="index.html#safety">Read safety info</a>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
