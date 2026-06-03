@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Send a Complaint | KindAuction</title>
+  <style>
+    :root {
+      --bg: #fffaf2;
+      --surface: #ffffff;
+      --surface-soft: #fff8ed;
+      --border: #eadfd2;
+      --text: #273235;
+      --muted: #637174;
+      --brand: #ff8f70;
+      --brand-dark: #d95f43;
+      --green: #2f8f68;
+      --blue: #3377b5;
+      --danger: #bf4545;
+      --shadow: 0 14px 40px rgba(83, 63, 43, 0.11);
+      --radius: 24px;
+      --focus: 0 0 0 4px rgba(51, 119, 181, 0.2);
+      --max: 920px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255, 209, 102, 0.2), transparent 34rem),
+        linear-gradient(180deg, var(--bg), #fffdf9 48%, #f7fbf8);
+      line-height: 1.5;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, select, textarea { font: inherit; }
+    .container { width: min(var(--max), calc(100% - 2rem)); margin-inline: auto; }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255, 250, 242, 0.9);
+      border-bottom: 1px solid rgba(234, 223, 210, 0.85);
+      backdrop-filter: blur(16px);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.9rem 0;
+    }
+
+    .logo { display: inline-flex; align-items: center; gap: 0.6rem; font-weight: 950; font-size: 1.18rem; }
+    .logo-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #ffd166, #ff8f70 54%, #8fd9b6);
+      box-shadow: 0 8px 20px rgba(255, 143, 112, 0.25);
+    }
+
+    main { padding: 2rem 0 3rem; }
+    .page-grid { display: grid; gap: 1rem; align-items: start; }
+    .intro, .form-card, .support-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .intro { padding: 1.3rem; }
+    .form-card, .support-card { padding: 1.15rem; }
+    h1, h2 { line-height: 1.08; margin: 0; letter-spacing: -0.04em; }
+    h1 { font-size: clamp(2rem, 7vw, 3.3rem); }
+    h2 { font-size: 1.35rem; }
+    p { margin: 0; color: var(--muted); }
+
+    .form-grid { display: grid; gap: 0.9rem; margin-top: 1rem; }
+    label {
+      display: grid;
+      gap: 0.35rem;
+      color: #465356;
+      font-size: 0.9rem;
+      font-weight: 850;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fffdf9;
+      color: var(--text);
+      padding: 0.75rem;
+    }
+
+    input, select { min-height: 46px; }
+    textarea { min-height: 150px; resize: vertical; }
+    input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visible {
+      outline: none;
+      box-shadow: var(--focus);
+    }
+
+    .field-row { display: grid; gap: 0.9rem; }
+    .hint { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .button, button {
+      border: 0;
+      border-radius: 999px;
+      background: var(--brand);
+      color: white;
+      cursor: pointer;
+      font-weight: 800;
+      padding: 0.85rem 1.05rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+    }
+
+    .button.secondary {
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    button:hover, .button:hover { background: var(--brand-dark); }
+    .button.secondary:hover { background: var(--surface-soft); }
+    .actions { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
+
+    .notice {
+      display: none;
+      border-radius: 16px;
+      padding: 0.85rem;
+      border: 1px solid #cfeee0;
+      background: #eaf8f1;
+      color: var(--green);
+      font-weight: 850;
+    }
+
+    .notice.is-visible { display: block; }
+    .support-card { display: grid; gap: 0.85rem; }
+    .support-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 0.7rem;
+    }
+
+    .support-list li {
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 0.8rem;
+      color: #4b5a5d;
+      font-weight: 750;
+    }
+
+    .urgent {
+      border-color: rgba(191, 69, 69, 0.3);
+      background: #fff3f0;
+      color: var(--danger);
+    }
+
+    @media (min-width: 760px) {
+      .page-grid { grid-template-columns: 1fr 300px; }
+      .intro { grid-column: 1 / -1; }
+      .field-row { grid-template-columns: 1fr 1fr; }
+      .form-card { padding: 1.35rem; }
+    }
+
+    @media (max-width: 520px) {
+      .topbar .button { display: none; }
+      .actions, .actions .button, .actions button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container topbar">
+      <a class="logo" href="index.html" aria-label="KindAuction home">
+        <span class="logo-mark" aria-hidden="true">KA</span>
+        <span>KindAuction</span>
+      </a>
+      <a class="button secondary" href="index.html">Back to auctions</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="container page-grid">
+      <section class="intro" aria-labelledby="complaint-title">
+        <h1 id="complaint-title">Send a complaint</h1>
+        <p>Tell us about a listing, seller, buyer, payment, pickup, or safety concern. KindAuction support will review the details and follow up through the contact information you provide.</p>
+      </section>
+
+      <section class="form-card" aria-labelledby="form-title">
+        <h2 id="form-title">Complaint details</h2>
+        <form class="form-grid" id="complaintForm">
+          <div class="field-row">
+            <label>Your name
+              <input name="name" autocomplete="name" required />
+            </label>
+            <label>Email address
+              <input name="email" type="email" autocomplete="email" required />
+            </label>
+          </div>
+
+          <div class="field-row">
+            <label>Complaint type
+              <select name="type" required>
+                <option value="">Choose a type</option>
+                <option>Listing concern</option>
+                <option>Seller or buyer behavior</option>
+                <option>Payment issue</option>
+                <option>Pickup or delivery issue</option>
+                <option>Product safety concern</option>
+                <option>Other support request</option>
+              </select>
+            </label>
+            <label>Related listing or order ID
+              <input name="reference" placeholder="Optional" />
+              <span class="hint">Use the item title if you do not have an ID.</span>
+            </label>
+          </div>
+
+          <label>What happened?
+            <textarea name="details" minlength="20" placeholder="Include dates, names, messages, and what outcome you are asking for." required></textarea>
+          </label>
+
+          <label>Preferred follow-up
+            <select name="followup" required>
+              <option>Email me</option>
+              <option>Call me</option>
+              <option>No follow-up needed</option>
+            </select>
+          </label>
+
+          <div class="notice" id="complaintNotice" role="status" aria-live="polite">
+            Complaint submitted. This prototype stores no data, but the support flow is ready for a backend connection.
+          </div>
+
+          <div class="actions">
+            <button type="submit">Submit complaint</button>
+            <a class="button secondary" href="contact.html">Contact support</a>
+          </div>
+        </form>
+      </section>
+
+      <aside class="support-card" aria-labelledby="support-title">
+        <h2 id="support-title">Before sending</h2>
+        <ul class="support-list">
+          <li>Save screenshots or messages related to the issue.</li>
+          <li>Include listing names, order IDs, or pickup dates when available.</li>
+          <li class="urgent">For immediate danger or illegal activity, contact local authorities first.</li>
+        </ul>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const complaintForm = document.querySelector("#complaintForm");
+    const complaintNotice = document.querySelector("#complaintNotice");
+
+    complaintForm.addEventListener("submit", event => {
+      event.preventDefault();
+      if (!complaintForm.checkValidity()) {
+        complaintForm.reportValidity();
+        return;
+      }
+      complaintNotice.classList.add("is-visible");
+      complaintForm.reset();
+    });
+  </script>
+</body>
+</html>
